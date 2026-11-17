@@ -10,7 +10,6 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven("https://xposed.info")
     }
 }
 rootProject.name = "LiquidGlassLockscreen"
