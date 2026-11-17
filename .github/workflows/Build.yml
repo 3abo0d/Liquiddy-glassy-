@@ -9,10 +9,23 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-      - name: Generate Clean AndroidManifest.xml
+      - name: Generate Manifest, Xposed Stubs & Fix Array Index
         run: |
-          mkdir -p app/src/main
+          mkdir -p app/src/main/java/de/robv/android/xposed/callbacks
           python3 -c 'import base64; open("app/src/main/AndroidManifest.xml","wb").write(base64.b64decode("PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPG1hbmlmZXN0IHhtbG5zOmFuZHJvaWQ9Imh0dHA6Ly9zY2hlbWFzLmFuZHJvaWQuY29tL2Fway9yZXMvYW5kcm9pZCI+CiAgICA8YXBwbGljYXRpb24gYW5kcm9pZDpsYWJlbD0iTGlxdWlkR2xhc3MgTG9ja3NjcmVlbiI+CiAgICAgICAgPG1ldGEtZGF0YSBhbmRyb2lkOm5hbWU9Inhwb3NlZG1vZHVsZSIgYW5kcm9pZDp2YWx1ZT0idHJ1ZSIgLz4KICAgICAgICA8bWV0YS1kYXRhIGFuZHJvaWQ6bmFtZT0ieHBvc2VkZGVzY3JpcHRpb24iIGFuZHJvaWQ6dmFsdWU9IkNvbG9yT1MgMTYgTGlxdWlkIEdsYXNzIENsb2NrIGFuZCBMb2Nrc2NyZWVuIEx5cmljcyIgLz4KICAgICAgICA8bWV0YS1kYXRhIGFuZHJvaWQ6bmFtZT0ieHBvc2VkbWludmVyc2lvbiIgYW5kcm9pZDp2YWx1ZT0iOTMiIC8+CiAgICAgICAgPG1ldGEtZGF0YSBhbmRyb2lkOm5hbWU9Inhwb3NlZHNjb3BlIiBhbmRyb2lkOnJlc291cmNlPSJAYXJyYXkveHBvc2VkX3Njb3BlIiAvPgogICAgPC9hcHBsaWNhdGlvbj4KPC9tYW5pZmVzdD4K"))'
+          python3 -c '
+          import os
+          base = "app/src/main/java/de/robv/android/xposed"
+          open(f"{base}/callbacks/XC_LoadPackage.java", "w").write("package de.robv.android.xposed.callbacks;\npublic class XC_LoadPackage { public static class LoadPackageParam { public String packageName; public ClassLoader classLoader; } }\n")
+          open(f"{base}/IXposedHookLoadPackage.java", "w").write("package de.robv.android.xposed;\nimport de.robv.android.xposed.callbacks.XC_LoadPackage;\npublic interface IXposedHookLoadPackage { void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable; }\n")
+          open(f"{base}/XC_MethodHook.java", "w").write("package de.robv.android.xposed;\nimport java.lang.reflect.Member;\npublic abstract class XC_MethodHook { public static class MethodHookParam { public Member method; public Object thisObject; public Object[] args; public Object result; } protected void beforeHookedMethod(MethodHookParam param) throws Throwable {} protected void afterHookedMethod(MethodHookParam param) throws Throwable {} }\n")
+          open(f"{base}/XposedBridge.java", "w").write("package de.robv.android.xposed;\npublic class XposedBridge { public static void log(String text) {} public static void log(Throwable t) {} }\n")
+          open(f"{base}/XposedHelpers.java", "w").write("package de.robv.android.xposed;\npublic class XposedHelpers { public static class Unhook {} public static Unhook findAndHookMethod(Class<?> clazz, String methodName, Object... parameterTypesAndCallback) { return new Unhook(); } }\n")
+          hook = "app/src/main/java/com/custom/liquidglass/MainHook.kt"
+          if os.path.exists(hook):
+              s = open(hook).read().replace("param.args as Int", "param.args[0] as Int")
+              open(hook, "w").write(s)
+          '
       - name: Accept Android Licenses & Build APK
         run: |
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
