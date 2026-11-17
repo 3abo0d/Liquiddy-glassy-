@@ -24,7 +24,3 @@ android {
         jvmTarget = "17"
     }
 }
-
-dependencies {
-    compileOnly("io.github.libxposed:legacy-api:100")
-}
