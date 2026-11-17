@@ -9,6 +9,10 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+      - name: Generate Clean AndroidManifest.xml
+        run: |
+          mkdir -p app/src/main
+          printf '<?xml version="1.0" encoding="utf-8"?>\n<manifest xmlns:android="http://android.com">\n    <application android:label="LiquidGlass Lockscreen">\n        <meta-data android:name="xposedmodule" android:value="true" />\n        <meta-data android:name="xposeddescription" android:value="ColorOS 16 Liquid Glass Clock and Lockscreen Lyrics" />\n        <meta-data android:name="xposedminversion" android:value="93" />\n        <meta-data android:name="xposedscope" android:resource="@array/xposed_scope" />\n    </application>\n</manifest>\n' > app/src/main/AndroidManifest.xml
       - name: Accept Android Licenses & Build APK
         run: |
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
