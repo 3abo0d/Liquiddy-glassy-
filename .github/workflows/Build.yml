@@ -12,7 +12,7 @@ jobs:
       - name: Generate Clean AndroidManifest.xml
         run: |
           mkdir -p app/src/main
-          printf '<?xml version="1.0" encoding="utf-8"?>\n<manifest xmlns:android="http://android.com">\n    <application android:label="LiquidGlass Lockscreen">\n        <meta-data android:name="xposedmodule" android:value="true" />\n        <meta-data android:name="xposeddescription" android:value="ColorOS 16 Liquid Glass Clock and Lockscreen Lyrics" />\n        <meta-data android:name="xposedminversion" android:value="93" />\n        <meta-data android:name="xposedscope" android:resource="@array/xposed_scope" />\n    </application>\n</manifest>\n' > app/src/main/AndroidManifest.xml
+          python3 -c 'import base64; open("app/src/main/AndroidManifest.xml","wb").write(base64.b64decode("PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPG1hbmlmZXN0IHhtbG5zOmFuZHJvaWQ9Imh0dHA6Ly9zY2hlbWFzLmFuZHJvaWQuY29tL2Fway9yZXMvYW5kcm9pZCI+CiAgICA8YXBwbGljYXRpb24gYW5kcm9pZDpsYWJlbD0iTGlxdWlkR2xhc3MgTG9ja3NjcmVlbiI+CiAgICAgICAgPG1ldGEtZGF0YSBhbmRyb2lkOm5hbWU9Inhwb3NlZG1vZHVsZSIgYW5kcm9pZDp2YWx1ZT0idHJ1ZSIgLz4KICAgICAgICA8bWV0YS1kYXRhIGFuZHJvaWQ6bmFtZT0ieHBvc2VkZGVzY3JpcHRpb24iIGFuZHJvaWQ6dmFsdWU9IkNvbG9yT1MgMTYgTGlxdWlkIEdsYXNzIENsb2NrIGFuZCBMb2Nrc2NyZWVuIEx5cmljcyIgLz4KICAgICAgICA8bWV0YS1kYXRhIGFuZHJvaWQ6bmFtZT0ieHBvc2VkbWludmVyc2lvbiIgYW5kcm9pZDp2YWx1ZT0iOTMiIC8+CiAgICAgICAgPG1ldGEtZGF0YSBhbmRyb2lkOm5hbWU9Inhwb3NlZHNjb3BlIiBhbmRyb2lkOnJlc291cmNlPSJAYXJyYXkveHBvc2VkX3Njb3BlIiAvPgogICAgPC9hcHBsaWNhdGlvbj4KPC9tYW5pZmVzdD4K"))'
       - name: Accept Android Licenses & Build APK
         run: |
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
